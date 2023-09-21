@@ -4,6 +4,7 @@ using UnityEngine.UI; // UI 관련 코드
 // 플레이어 캐릭터의 생명체로서의 동작을 담당
 public class PlayerHealth : LivingEntity {
     public Slider healthSlider; // 체력을 표시할 UI 슬라이더
+    private Quaternion healthSliderRot;
 
     public AudioClip deathClip; // 사망 소리
     public AudioClip hitClip; // 피격 소리
@@ -16,30 +17,70 @@ public class PlayerHealth : LivingEntity {
     private PlayerShooter playerShooter; // 플레이어 슈터 컴포넌트
 
     private void Awake() {
-        // 사용할 컴포넌트를 가져오기
-    }
+		healthSliderRot = healthSlider.transform.rotation;
+
+		// 사용할 컴포넌트를 가져오기
+		playerAudioPlayer = GetComponent<AudioSource>();
+		playerAnimator = GetComponent<Animator>();
+		playerMovement = GetComponent<PlayerMovement>();
+		playerShooter = GetComponent<PlayerShooter>();
+
+	}
 
     protected override void OnEnable() {
         // LivingEntity의 OnEnable() 실행 (상태 초기화)
         base.OnEnable();
+
+        healthSlider.gameObject.SetActive(true);
+		healthSlider.minValue = 0;
+		healthSlider.maxValue = startingHealth; //최대값을 기본값으로 변경.
+        healthSlider.value = health;
+
+        playerMovement.enabled = true;
+        playerShooter.enabled = true;
     }
 
-    // 체력 회복
-    public override void RestoreHealth(float newHealth) {
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnDamage(20, Vector3.zero, Vector3.zero);
+        }
+        healthSlider.transform.rotation = healthSliderRot;
+	}
+
+	// 체력 회복
+	public override void RestoreHealth(float newHealth) { 
         // LivingEntity의 RestoreHealth() 실행 (체력 증가)
         base.RestoreHealth(newHealth);
+        healthSlider.value = health;
     }
 
     // 데미지 처리
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitDirection) {
+        
+        if (!dead)
+        {
+			playerAudioPlayer.PlayOneShot(hitClip);
+		}
+        
         // LivingEntity의 OnDamage() 실행(데미지 적용)
         base.OnDamage(damage, hitPoint, hitDirection);
-    }
+		healthSlider.value = health;
+        
+	}
 
     // 사망 처리
     public override void Die() {
         // LivingEntity의 Die() 실행(사망 적용)
         base.Die();
+
+        healthSlider.gameObject.SetActive(false);
+        playerAudioPlayer.PlayOneShot(deathClip);
+        playerAnimator.SetTrigger("Die");
+
+		playerMovement.enabled = false;
+        playerShooter.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other) {
