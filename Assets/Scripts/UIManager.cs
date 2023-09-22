@@ -11,7 +11,7 @@ public class UIManager : MonoBehaviour {
         {
             if (m_instance == null)
             {
-                m_instance = FindObjectOfType<UIManager>();
+                m_instance = FindObjectOfType<UIManager>(); //모든 오브젝트를 순회하기 때문에 사용을 지양해야 함
             }
 
             return m_instance;

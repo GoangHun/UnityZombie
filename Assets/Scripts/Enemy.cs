@@ -95,7 +95,7 @@ public class Enemy : LivingEntity {
     // 데미지를 입었을때 실행할 처리
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal) {
         hitEffect.transform.position = hitPoint;
-        hitEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
+        hitEffect.transform.rotation = Quaternion.LookRotation(hitNormal);  //레이의 법선 방향으로 회전
         hitEffect.Play();
         enemyAudioPlayer.PlayOneShot(hitSound);
         
@@ -122,6 +122,28 @@ public class Enemy : LivingEntity {
     }
 
     private void OnTriggerStay(Collider other) {
-        // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
-    }
+		// 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행
+		if (lastAttackTime + timeBetAttack < Time.time && other.gameObject == targetEntity.gameObject && !targetEntity.dead)
+        {
+			lastAttackTime = Time.time;
+            targetEntity.OnDamage(damage, Vector3.zero, Vector3.zero);
+		}
+
+
+		/*var palyer = other.GetComponent<IDamageable>();
+        if (palyer != null)
+        {
+			if (lastAttackTime + timeBetAttack < Time.time)
+			{
+				lastAttackTime = Time.time;
+
+				Vector3 crossPos = other.ClosestPoint(transform.position);
+                Vector3 nomalVec = crossPos - transform.position;
+                nomalVec.Normalize();
+				palyer.OnDamage(damage, crossPos, nomalVec);
+
+		palyer.OnDamage(damage, Vector3.zero, Vector3.zero);
+			}
+		}*/
+	}
 }

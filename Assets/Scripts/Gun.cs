@@ -35,7 +35,7 @@ public class Gun : MonoBehaviour {
     public float reloadTime = 1.8f; // 재장전 소요 시간
     private float lastFireTime; // 총을 마지막으로 발사한 시점
 
-
+    public event System.Action onCompleteReload;
     private void Awake() {
         // 사용할 컴포넌트들의 참조를 가져오기
         gunAudioPlayer = GetComponent<AudioSource>();
@@ -130,6 +130,11 @@ public class Gun : MonoBehaviour {
             ammoToFill = ammoRemain;
         ammoRemain -= ammoToFill;
         magAmmo += ammoToFill;
+
+        if (onCompleteReload != null)
+        {
+            onCompleteReload();
+        }
 
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;

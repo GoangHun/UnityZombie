@@ -61,6 +61,7 @@ public class PlayerMovement : MonoBehaviour {
     // 입력값에 따라 캐릭터를 좌우로 회전
     private void Rotate() {
 		Ray ray = worldCam.ScreenPointToRay(Input.mousePosition);
+		
 		if (Physics.Raycast(ray, out RaycastHit hitInfo, 100f, layerMask))
 		{
 			Vector3 lookPoint = hitInfo.point;

@@ -15,6 +15,7 @@ public class PlayerShooter : MonoBehaviour {
         // 사용할 컴포넌트들을 가져오기
         playerInput = GetComponent<PlayerInput>();
         playerAnimator = GetComponent<Animator>();
+        gun.onCompleteReload += () => UpdateUI();
     }
 
     private void OnEnable() {
